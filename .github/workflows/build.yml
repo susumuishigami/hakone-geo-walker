@@ -1,0 +1,74 @@
+name: Build Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-html:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx myst-parser sphinxcontrib-bibtex
+    
+    - name: Build HTML
+      run: |
+        cd docs
+        sphinx-build -b html . _build/html
+    
+    - name: Upload HTML artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: html-docs
+        path: docs/_build/html
+
+  build-pdf:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx myst-parser sphinxcontrib-bibtex
+    
+    - name: Install LaTeX
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y texlive-xetex texlive-latex-extra texlive-fonts-recommended latexmk
+    
+    - name: Build LaTeX
+      run: |
+        cd docs
+        sphinx-build -b latex . _build/latex
+    
+    - name: Build PDF with latexmk
+      run: |
+        cd docs/_build/latex
+        latexmk -pdf -xelatex hakone-geo-walker.tex || true
+    
+    - name: Upload PDF artifact
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: pdf-docs
+        path: docs/_build/latex/*.pdf
