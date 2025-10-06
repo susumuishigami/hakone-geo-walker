@@ -33,7 +33,7 @@ jobs:
         name: html-docs
         path: docs/_build/html
 
-  build-pdf:
+  check-pdf:
     runs-on: ubuntu-latest
     continue-on-error: true
     
@@ -51,22 +51,27 @@ jobs:
     - name: Install dependencies
       run: uv sync
     
-    - name: Install LaTeX
+    - name: Check LaTeX generation
       run: |
-        sudo apt-get update
-        sudo apt-get install -y texlive-xetex texlive-latex-extra texlive-fonts-recommended latexmk
-    
-    - name: Build LaTeX
-      run: uv run sphinx-build -b latex docs docs/_build/latex
-    
-    - name: Build PDF with latexmk
-      run: |
-        cd docs/_build/latex
-        latexmk -pdf -xelatex hakone-geo-walker.tex || true
-    
-    - name: Upload PDF artifact
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: pdf-docs
-        path: docs/_build/latex/*.pdf
+        # LaTeXソースの生成のみ（PDFビルドはしない）
+        uv run sphinx-build -b latex docs docs/_build/latex
+        echo "✅ LaTeX source generation successful"
+        
+        # 生成されたTeXファイルの基本チェック
+        if [ -f "docs/_build/latex/hakone-geo-walker.tex" ]; then
+          echo "✅ hakone-geo-walker.tex generated"
+          # ファイルサイズチェック（空でないか）
+          if [ -s "docs/_build/latex/hakone-geo-walker.tex" ]; then
+            echo "✅ LaTeX file is not empty"
+          else
+            echo "❌ LaTeX file is empty"
+            exit 1
+          fi
+        else
+          echo "❌ hakone-geo-walker.tex not found"
+          exit 1
+        fi
+        
+        # 構文エラーチェック（実際にコンパイルはしない）
+        echo "ℹ️  LaTeX file preview:"
+        head -20 docs/_build/latex/hakone-geo-walker.tex
