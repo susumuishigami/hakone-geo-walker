@@ -23,16 +23,12 @@ dependencies = [
     "myst-parser>=2.0.0",
     "sphinxcontrib-bibtex>=2.5.0",
     "sphinx-rtd-theme>=1.3.0",
-]
-
-[project.optional-dependencies]
-dev = [
+    # 開発・品質管理ツール
     "pytest>=7.0.0",
     "ruff>=0.1.0",
     "mypy>=1.0.0",
-]
-latex = [
-    "latexmk",
+    # LaTeX関連（macOSならMacTeXで十分、Linuxなら必要）
+    # "latexmk",  # 必要に応じてコメントアウト
 ]
 
 [project.urls]

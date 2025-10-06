@@ -39,12 +39,7 @@ hakone-geo-walker/
 
 uvで仮想環境作成と依存関係インストール
 ```console
-uv sync
-```
-
-#### 開発用依存関係も含める場合
-```console
-uv sync --extra dev
+% uv sync
 ```
 
 ## ビルド方法
@@ -72,11 +67,6 @@ uv sync --extra dev
 新しいパッケージを追加
 ```console
 % uv add package-name
-```
-
-開発用パッケージを追加
-```console
-% uv add --dev package-name
 ```
 
 依存関係を更新
