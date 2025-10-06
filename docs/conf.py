@@ -26,7 +26,8 @@ bibtex_bibfiles = ["refs.bib"]
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-language = "ja"
+# XeLaTeXを使う場合は日本語設定を無効化してフォントで対応
+# language = "ja"  # コメントアウト
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "alabaster"
@@ -52,7 +53,19 @@ latex_elements = {
     "fncychap": "",
     "babel": "",
     "polyglossia": "",
+    # 言語選択を無効化
+    "passoptionstopackages": r"\PassOptionsToPackage{english}{babel}",
+    # XeLaTeXで日本語を使う場合、jsclassesを無効化
+    "extraclassoptions": "openany,oneside",
 }
+
+# XeLaTeX使用時は日本語用のクラスファイル使用を無効化
+latex_use_latex_multicolumn = True
+latex_use_xindy = False
+
+# 言語設定を完全に無効化
+latex_elements["babel"] = ""
+latex_elements["polyglossia"] = ""
 
 latex_documents = [
     ("index", "hakone-geo-walker.tex", "東海道箱根のミニ研究論文", "Author", "manual"),
