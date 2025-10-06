@@ -39,7 +39,19 @@ latex_elements = {
     'pointsize': '11pt',
     'preamble': r'''
 \usepackage{xeCJK}
+\usepackage{fontspec}
+% macOSの標準的な日本語フォントを使用
+\setCJKmainfont[BoldFont=Hiragino Mincho ProN]{Hiragino Mincho ProN}
+\setCJKsansfont[BoldFont=Hiragino Kaku Gothic ProN]{Hiragino Kaku Gothic ProN}
+\setCJKmonofont{Menlo}
+\setmainfont{Times New Roman}
+\setsansfont{Arial}
+\setmonofont{Menlo}
+\xeCJKsetup{CJKmath=true}
 ''',
+    'fncychap': '',
+    'babel': '',
+    'polyglossia': '',
 }
 
 latex_documents = [
