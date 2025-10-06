@@ -103,17 +103,17 @@ PDFドキュメントをビルド
 
 コードフォーマット（ruff）
 ```console
-% uv run ruff format code/
+% uv run ruff format
 ```
 
 コードリント（ruff）
 ```console
-% uv run ruff check code/
+% uv run ruff check
 ```
 
 型チェック（mypy）
 ```console
-% uv run mypy code/
+% uv run mypy .
 ```
 
 テスト実行
