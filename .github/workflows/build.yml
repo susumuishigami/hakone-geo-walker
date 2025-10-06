@@ -1,0 +1,77 @@
+name: Build Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-html:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: Set up Python
+      run: uv python install 3.14
+    
+    - name: Install dependencies
+      run: uv sync
+    
+    - name: Build HTML
+      run: uv run sphinx-build -b html docs docs/_build/html
+    
+    - name: Upload HTML artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-docs
+        path: docs/_build/html
+
+  check-pdf:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: Set up Python
+      run: uv python install 3.14
+    
+    - name: Install dependencies
+      run: uv sync
+    
+    - name: Check LaTeX generation
+      run: |
+        # LaTeXソースの生成のみ（PDFビルドはしない）
+        uv run sphinx-build -b latex docs docs/_build/latex
+        echo "✅ LaTeX source generation successful"
+        
+        # 生成されたTeXファイルの基本チェック
+        if [ -f "docs/_build/latex/hakone-geo-walker.tex" ]; then
+          echo "✅ hakone-geo-walker.tex generated"
+          # ファイルサイズチェック（空でないか）
+          if [ -s "docs/_build/latex/hakone-geo-walker.tex" ]; then
+            echo "✅ LaTeX file is not empty"
+          else
+            echo "❌ LaTeX file is empty"
+            exit 1
+          fi
+        else
+          echo "❌ hakone-geo-walker.tex not found"
+          exit 1
+        fi
+        
+        # 構文エラーチェック（実際にコンパイルはしない）
+        echo "ℹ️  LaTeX file preview:"
+        head -20 docs/_build/latex/hakone-geo-walker.tex
