@@ -26,6 +26,30 @@ Exploring Japan's historical highways through culture, geography, and GIS.
 
 Geo walker / 地理情報行路者
 
+## リポジトリポリシー / Repository Policy
+
+このリポジトリは現在、研究および開発の進行中段階にあります。
+正式な公開版は、[リリースページ](https://github.com/susumuishigami/hakone-geo-walker/releases) で公開されます。
+
+`main` を含むすべてのブランチは作業中（WIP）です。
+
+- タグ付きリリース：公開・確認済みの安定版  
+- `main` ブランチ：統合作業・検証中のドラフト  
+- その他のブランチ：実験的または作業中（WIP）  
+- 検証中のデータや文書には未確認の情報が含まれる場合があります  
+- 内容は予告なく変更されることがあります
+
+This repository is currently under active development and research.
+Official public versions are provided on the [Releases page](https://github.com/susumuishigami/hakone-geo-walker/releases).
+
+All branches, including `main`, are drafts or works in progress.
+
+- Tagged releases: verified and published versions
+- `main` branch: integrated draft under review
+- other branches: experimental or work in progress (WIP)
+- data and documents under review may include unverified information
+- contents are subject to change without notice
+
 ## ディレクトリ構成
 
 ```
@@ -136,6 +160,9 @@ PDFドキュメントをビルド
   - [Actions](https://github.com/susumuishigami/hakone-geo-walker/actions/workflows/build.yml) - `Build Documentation` - `build-html` - `Upload HTML artifacts`
 - LaTeX/PDFのビルドについても対応予定
 
-## オープンサイエンスについて
+## ライセンス / License
 
-この研究は、学びと発見を共有することを目的に **Creative Commons BY 4.0** ライセンスで公開しています。
+この研究は「オープンサイエンス」の理念に基づき、学びと発見を共有することを目的に公開しています。
+
+- Texts, papers, and documents: [CC BY 4.0](./LICENSE-doc)
+- Source code and scripts: [MIT License](./LICENSE-code)
