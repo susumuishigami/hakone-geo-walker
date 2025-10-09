@@ -1,47 +1,54 @@
 # hakone-geo-walker
 
-東海道箱根のミニ研究論文
-
 ## プロジェクト概要
 
-東海道箱根のミニ研究論文を執筆・公開するプロジェクトです。
+東海道箱根を歴史とGISを用いて研究するミニ論文を執筆・公開するプロジェクトです。
 Sphinx+MySTを使用して研究論文をビルドし、HTMLおよびPDF形式で出力します。
 
 ## 研究概要
-- **テーマ**：旧東海道・箱根越えに見る「歩行文化と地理的要素」の関係  
-- **手法**：  
+
+- テーマ:
+  - 旧東海道・箱根越えに見る「歩行文化と地理的要素」の関係
+- 目的:
+  - 歴史的街道を「単なる交通路」ではなく、人々の営み・文化・知の移動空間として再解釈
+- 手法:
   - GISによる地形・距離・傾斜などの可視化  
   - 江戸期文献（『東海道中膝栗毛』など）の記述分析  
   - 現地踏査による空間的・文化的比較
-- **目的**：  
-  歴史的街道を「単なる交通路」ではなく、  
-  人々の営み・文化・知の移動空間として再解釈すること。
+
+## プロフィール
+
+Susumu ISHIGAMI
+
+ITエンジニアとして培ったデータ分析とシステム構築の経験をもとに、歴史的街道を歩き、GIS、文献、現地調査を通して人が歩く空間にどのような文化が生まれるかを探る、ひとりの研究者。
+
+Exploring Japan's historical highways through culture, geography, and GIS.
+
+Geo walker / 地理情報行路者
 
 ## ディレクトリ構成
 
 ```
 hakone-geo-walker/
-├── README.md           # このファイル
-├── docs/               # Sphinxドキュメントソース
-│   ├── conf.py         # Sphinx設定ファイル
-│   ├── index.md        # 目次ページ
-│   ├── 01-intro.md     # 第1章：はじめに
-│   ├── 02-background.md # 第2章：背景
-│   ├── 03-methodology.md # 第3章：方法論
-│   ├── 04-results.md   # 第4章：結果
-│   ├── 05-discussion.md # 第5章：考察
-│   ├── 06-conclusion.md # 第6章：結論
-│   └── refs.bib        # 参考文献データベース
-├── code/               # コードファイル
-├── data/               # データファイル
-└── figs/               # 図表ファイル
+├── README.md               # このファイル
+├── docs/                   # Sphinxドキュメントソース
+│   ├── conf.py            # Sphinx設定ファイル
+│   ├── index.md           # 目次ページ
+│   ├── 01-intro.md        # 第1章：はじめに
+│   ├──     :              # 以降本文
+│   └── refs.bib           # 参考文献データベース
+├── code/                   # コードファイル
+├── data/                   # データファイル
+│   ├── public/            # 公開データ
+│   └── private/           # 非公開データ（本体はGoogle Drive等に保存）
+└── figs/                   # 図表ファイル
 ```
 
 ## セットアップ
 
 ### 必要な環境
 
-- Python 3.14以上（3.14.0rc3）
+- Python 3.14以上
 - [uv](https://github.com/astral-sh/uv) 0.4.0以上（パッケージ管理）
 - LaTeX（PDF生成の場合、XeLaTeXが必要）
 
@@ -124,13 +131,11 @@ PDFドキュメントをビルド
 ## GitHub Actions
 
 このリポジトリでは、GitHub ActionsによるCI/CDが設定されています：
+
 - プッシュ時にHTMLビルドを自動実行
-- PDFビルドも試行（LaTeX環境により失敗する可能性があります）
+  - [Actions](https://github.com/susumuishigami/hakone-geo-walker/actions/workflows/build.yml) - `Build Documentation` - `build-html` - `Upload HTML artifacts`
+- LaTeX/PDFのビルドについても対応予定
 
 ## オープンサイエンスについて
 
-この研究は、学びと発見を共有することを目的に  
-**Creative Commons BY 4.0** ライセンスで公開しています。  
-
-誰もが再利用・再構築できる形で、  
-「歩く・記録する・考える」という知の循環を開いていきます。
+この研究は、学びと発見を共有することを目的に **Creative Commons BY 4.0** ライセンスで公開しています。
