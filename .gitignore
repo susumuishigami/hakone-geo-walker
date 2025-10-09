@@ -59,4 +59,4 @@ docs/_templates/
 Thumbs.db
 
 # data
-data/*
+data/private/*
