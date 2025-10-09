@@ -160,10 +160,9 @@ PDFドキュメントをビルド
   - [Actions](https://github.com/susumuishigami/hakone-geo-walker/actions/workflows/build.yml) - `Build Documentation` - `build-html` - `Upload HTML artifacts`
 - LaTeX/PDFのビルドについても対応予定
 
-## ライセンス
+## ライセンス / License
 
-この研究は、学びと発見を共有することを目的に **Creative Commons BY 4.0** ライセンスで公開しています。
-ソースコードは **MIT License** で公開します。
+この研究は「オープンサイエンス」の理念に基づき、学びと発見を共有することを目的に公開しています。
 
 - Texts, papers, and documents: [CC BY 4.0](./LICENSE-doc)
 - Source code and scripts: [MIT License](./LICENSE-code)
