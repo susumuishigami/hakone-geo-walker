@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 
-東海道箱根を歴史とGISを用いて研究するミニ論文を執筆・公開するプロジェクトです。
+東海道箱根を歴史とGISを用いて研究し、ミニ論文を執筆・公開するプロジェクトです。
 Sphinx+MySTを使用して研究論文をビルドし、HTMLおよびPDF形式で出力します。
 
 ## 研究概要
@@ -46,9 +46,9 @@ All branches, including `main`, are drafts or works in progress.
 
 - Tagged releases: verified and published versions
 - `main` branch: integrated draft under review
-- other branches: experimental or work in progress (WIP)
-- data and documents under review may include unverified information
-- contents are subject to change without notice
+- Other branches: experimental or works in progress (WIP)
+- Data and documents under review may include unverified information
+- Contents are subject to change without notice
 
 ## ディレクトリ構成
 
