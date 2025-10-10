@@ -46,9 +46,9 @@ All branches, including `main`, are drafts or works in progress.
 
 - Tagged releases: verified and published versions
 - `main` branch: integrated draft under review
-- other branches: experimental or work in progress (WIP)
-- data and documents under review may include unverified information
-- contents are subject to change without notice
+- Other branches: experimental or works in progress (WIP)
+- Data and documents under review may include unverified information
+- Contents are subject to change without notice
 
 ## ディレクトリ構成
 
