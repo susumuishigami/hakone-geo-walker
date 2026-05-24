@@ -1,3 +1,36 @@
+# =============================================================================
+# Sync from private dev repo to this Public repo
+# =============================================================================
+# このリポジトリ (Public, Open Science) は、別の Private 開発リポジトリ
+# (susumuishigami/hakone-geo-walker-dev) で行った試行錯誤の成果を、
+# 任意のタイミングで取り込むワークフローを採用しています。
+#
+#   Private (hakone-geo-walker-dev)  ──┐
+#     - AIによる試行錯誤・WIP            │  workflow_dispatch (手動)
+#     - メモ、ドラフト等もコミット可     │  rsync (--delete + excludes)
+#                                        ▼
+#   Public  (hakone-geo-walker)
+#     - 整理された公開版のみ
+#     - 同期コミットは github-actions[bot] が作成
+#
+# 認証:
+#   - Private read-only access: Deploy Key (secrets.PRIVATE_REPO_DEPLOY_KEY)
+#   - Public push: actions/checkout の GITHUB_TOKEN (contents: write)
+#
+# 除外ファイル/ディレクトリ (Private 側に存在しても Public へは持ち込まない):
+#   - .github/workflows/  Public 側で独立管理
+#   - data/private/       非公開データ
+#   - CLAUDE.md, AGENTS.md, .claude/  AI関連の指示・ログ
+#   - scratch/, notes/, memo/, .private/  作業メモ
+#   - *.draft.md, *.wip.md  未完成ドラフト
+#
+# タグ運用:
+#   - version 入力欄に値を入れると、同期 commit に対して `v<version>` の
+#     annotated tag を作成して push (例: 入力 "0.2.1" → タグ "v0.2.1")
+#   - 空欄ならタグなし。差分なしでも HEAD にタグを打てる
+#   - 間違えた場合は手動でタグ削除・付け直し可能
+# =============================================================================
+
 name: Sync from private
 
 on:
@@ -7,6 +40,11 @@ on:
         description: 'Private repo branch/ref to sync from'
         required: false
         default: 'main'
+        type: string
+      version:
+        description: 'Tag version (例: 0.1, v0.2.1, 1.0)。空欄ならタグなし。前後空白は自動除去。v 無しなら自動で v を付与'
+        required: false
+        default: ''
         type: string
 
 permissions:
@@ -69,6 +107,23 @@ jobs:
             --exclude='*.wip.md' \
             /tmp/private/ ./
 
+      - name: Normalize version input
+        id: version
+        env:
+          RAW_VERSION: ${{ inputs.version }}
+        run: |
+          stripped="$(printf '%s' "$RAW_VERSION" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+          if [ -n "$stripped" ]; then
+            case "$stripped" in
+              v*) ;;
+              *)  stripped="v$stripped" ;;
+            esac
+            echo "Tag to create: '$stripped'"
+          else
+            echo "No tag will be created (version input is empty)."
+          fi
+          echo "value=$stripped" >> "$GITHUB_OUTPUT"
+
       - name: Commit & push if changes
         run: |
           git config user.name  "github-actions[bot]"
@@ -76,10 +131,27 @@ jobs:
           git add -A
           if git diff --cached --quiet; then
             echo "No changes to sync."
-            exit 0
+          else
+            git commit -m "Sync from private (${PRIVATE_SHA})"
+            git push origin HEAD:main
           fi
-          git commit -m "Sync from private (${PRIVATE_SHA})"
-          git push origin HEAD:main
+
+      - name: Create and push tag
+        if: steps.version.outputs.value != ''
+        env:
+          TAG: ${{ steps.version.outputs.value }}
+        run: |
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "::error::Tag '$TAG' already exists locally. Choose a different version or delete the existing tag."
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "::error::Tag '$TAG' already exists on remote origin. Choose a different version or delete the existing tag."
+            exit 1
+          fi
+          git tag -a "$TAG" -m "Release $TAG (synced from private ${PRIVATE_SHA})"
+          git push origin "refs/tags/$TAG"
+          echo "Created tag: $TAG"
 
       - name: Cleanup SSH key
         if: always()
