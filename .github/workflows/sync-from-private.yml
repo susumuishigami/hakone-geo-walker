@@ -18,7 +18,9 @@
 #   - Public push: actions/checkout の GITHUB_TOKEN (contents: write)
 #
 # 除外ファイル/ディレクトリ (Private 側に存在しても Public へは持ち込まない):
-#   - .github/workflows/  Public 側で独立管理
+#   - .github/workflows/sync-from-private.yml  自分自身 (自己書き換え防止)
+#       ※ build.yml など他の workflow は Private で編集 → sync で同期する
+#       ※ Private 専用 workflow を作る場合はこの除外リストに追加
 #   - data/private/       非公開データ
 #   - CLAUDE.md, AGENTS.md, .claude/  AI関連の指示・ログ
 #   - scratch/, notes/, memo/, .private/  作業メモ
@@ -58,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout public (this repo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: true
@@ -124,7 +126,7 @@ jobs:
         run: |
           rsync -av --delete \
             --exclude='.git/' \
-            --exclude='.github/workflows/' \
+            --exclude='.github/workflows/sync-from-private.yml' \
             --exclude='data/private/' \
             --exclude='CLAUDE.md' \
             --exclude='AGENTS.md' \
