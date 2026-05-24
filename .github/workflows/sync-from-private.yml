@@ -18,9 +18,10 @@
 #   - Public push: actions/checkout の GITHUB_TOKEN (contents: write)
 #
 # 除外ファイル/ディレクトリ (Private 側に存在しても Public へは持ち込まない):
-#   - .github/workflows/sync-from-private.yml  自分自身 (自己書き換え防止)
-#       ※ build.yml など他の workflow は Private で編集 → sync で同期する
-#       ※ Private 専用 workflow を作る場合はこの除外リストに追加
+#   - .github/workflows/  Public 側で独立管理
+#       ※ GITHUB_TOKEN は workflow ファイルの変更を push できないため
+#         (GitHub のセキュリティ仕様。permissions では解除不可)
+#       ※ workflow を Private 側でも更新したら、Public 側でも別途同じ変更を適用すること
 #   - data/private/       非公開データ
 #   - CLAUDE.md, AGENTS.md, .claude/  AI関連の指示・ログ
 #   - scratch/, notes/, memo/, .private/  作業メモ
@@ -126,7 +127,7 @@ jobs:
         run: |
           rsync -av --delete \
             --exclude='.git/' \
-            --exclude='.github/workflows/sync-from-private.yml' \
+            --exclude='.github/workflows/' \
             --exclude='data/private/' \
             --exclude='CLAUDE.md' \
             --exclude='AGENTS.md' \
