@@ -125,7 +125,7 @@ jobs:
 
       - name: Rsync private -> public (with excludes)
         run: |
-          rsync -av --delete \
+          rsync -avc --delete \
             --exclude='.git/' \
             --exclude='.github/workflows/' \
             --exclude='data/private/' \
