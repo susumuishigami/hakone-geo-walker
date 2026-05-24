@@ -41,8 +41,9 @@ on:
         required: false
         default: 'main'
         type: string
+      # 空欄ならタグなし。前後空白は自動除去。v 無しなら自動で v を付与
       version:
-        description: 'Tag version (例: 0.1, v0.2.1, 1.0)。空欄ならタグなし。前後空白は自動除去。v 無しなら自動で v を付与'
+        description: 'Tag version (例: 0.1, v0.2.1, 1.0)'
         required: false
         default: ''
         type: string
