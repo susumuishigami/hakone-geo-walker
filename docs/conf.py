@@ -1,10 +1,16 @@
 # Configuration file for the Sphinx documentation builder.
 
+import pathlib
+import tomllib
+
 # -- Project information -----------------------------------------------------
 project = "東海道箱根のミニ研究論文"
-copyright = "2024"
-author = "Author"
-release = "0.1"
+copyright = "2025–2026, Susumu ISHIGAMI（本文 CC BY 4.0）"
+author = "Susumu ISHIGAMI"
+
+# バージョンの正は pyproject.toml。
+_pyproject = pathlib.Path(__file__).resolve().parent.parent / "pyproject.toml"
+release = tomllib.loads(_pyproject.read_text(encoding="utf-8"))["project"]["version"]
 
 # -- General configuration ---------------------------------------------------
 extensions = [
@@ -68,5 +74,11 @@ latex_elements["babel"] = ""
 latex_elements["polyglossia"] = ""
 
 latex_documents = [
-    ("index", "hakone-geo-walker.tex", "東海道箱根のミニ研究論文", "Author", "manual"),
+    (
+        "index",
+        "hakone-geo-walker.tex",
+        "東海道箱根のミニ研究論文",
+        "Susumu ISHIGAMI",
+        "manual",
+    ),
 ]

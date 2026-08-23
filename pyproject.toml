@@ -1,6 +1,6 @@
 [project]
 name = "hakone-geo-walker"
-version = "0.1.0"
+version = "26.8.1"
 description = "東海道箱根のミニ研究論文"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -18,17 +18,28 @@ classifiers = [
     "Topic :: Scientific/Engineering :: GIS",
 ]
 
+# 論文（Sphinx）のビルドに必要な依存だけを置く。
 dependencies = [
     "sphinx>=7.0.0",
     "myst-parser>=2.0.0",
     "sphinxcontrib-bibtex>=2.5.0",
     "sphinx-rtd-theme>=1.3.0",
-    # 開発・品質管理ツール
-    "pytest>=7.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0.0",
     # LaTeX関連（macOSならMacTeXで十分、Linuxなら必要）
     # "latexmk",  # 必要に応じてコメントアウト
+]
+
+# uv sync は dev グループを既定で入れる。GIS 解析用の重い依存は analysis グループに
+# 分け、必要なときだけ `uv sync --group analysis` で入れる（論文ビルドの CI に
+# GDAL 系を持ち込まないため）。
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.3",
+    "mypy>=2.3.1",
+]
+analysis = [
+    # numpy / rasterio / geopandas 等の GIS 依存はここに追加する。
 ]
 
 [project.urls]
@@ -41,8 +52,7 @@ target-version = "py314"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP"]
-ignore = []
+extend-select = ["E4", "E7", "F", "N", "UP"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -54,10 +64,20 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 
+[[tool.mypy.overrides]]
+module = ["analysis.*.tests.*", "tests.*"]
+disallow_untyped_defs = false
+check_untyped_defs = true
+
+[tool.coverage.run]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+fail_under = 100
+
 [tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra -q"
-testpaths = [
-    "tests",
-    "code",
-]
+minversion = "9.1"
+addopts = "-ra"
+# analysis パッケージを解決するためリポジトリルートを import パスに入れる
+pythonpath = ["."]
+testpaths = ["analysis", "tests"]
