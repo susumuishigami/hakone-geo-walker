@@ -4,12 +4,11 @@
 # 開発リポジトリ (susumuishigami/hakone-geo-walker-dev) の指定タグの内容を
 # この公開リポジトリへ取り込み、同名のタグを打つ。手動実行のみ。
 #
-# 2リポジトリ構成の背景、除外パスの一覧、ワークフローを別々に管理する理由は
-# Wiki にまとめてある。下の rsync の --exclude を変更したら Wiki も直すこと。
-#   https://github.com/susumuishigami/hakone-geo-walker/wiki/リポジトリ構成
-#
-# 実行するタイミングと前後の作業は次のページにある。
+# 2リポジトリ構成の背景と、リリースの中でこれを実行するタイミングは Wiki にある。
+#   https://github.com/susumuishigami/hakone-geo-walker/wiki/開発リポジトリ-と-公開リポジトリ
 #   https://github.com/susumuishigami/hakone-geo-walker/wiki/リリース手順
+#
+# 何を公開しないかはこのファイルの --exclude が正。Wiki からもここを参照している。
 # =============================================================================
 
 name: Sync from private
@@ -100,6 +99,8 @@ jobs:
 
       - name: Rsync private -> public (with excludes)
         run: |
+          # 除外を追加・変更したら、開発リポジトリの CLAUDE.md にある置き場所の
+          # 案内も合わせて直すこと。
           rsync -avc --delete \
             --exclude='.git/' \
             --exclude='.github/workflows/' \
