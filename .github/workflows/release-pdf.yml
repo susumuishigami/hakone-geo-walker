@@ -4,7 +4,7 @@
 # Release / Pre-Release として公開したタグの内容から PDF をビルドし、
 # Actions Artifact に保存したうえで Release アセットとして添付する。
 #
-# 事故を防ぐため、Private 側でビルドした成果物は使わない。必ずこの公開
+# 事故を防ぐため、開発リポジトリでビルドした成果物は使わない。必ずこの公開
 # リポジトリに sync 済みのタグを checkout し、そこからビルドする。
 #
 # TeX Live の導入に時間がかかるため、通常の CI (build.yml) には置かない。
