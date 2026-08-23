@@ -1,0 +1,152 @@
+# =============================================================================
+# Release PDF
+# =============================================================================
+# Release / Pre-Release として公開したタグの内容から PDF をビルドし、
+# Actions Artifact に保存したうえで Release アセットとして添付する。
+#
+# 事故を防ぐため、開発リポジトリでビルドした成果物は使わない。必ずこの公開
+# リポジトリに sync 済みのタグを checkout し、そこからビルドする。
+#
+# TeX Live の導入に時間がかかるため、通常の CI (build.yml) には置かない。
+#
+# Pre-Release と Release は PDF のファイル名で区別する。
+#   Pre-Release : hakone-geo-walker-v26.8.2-prerelease.pdf
+#   Release     : hakone-geo-walker-v26.8.2.pdf
+#
+# 手動実行時も対象タグの Release から Pre-Release かどうかを読むため、
+# Release が未作成のタグはビルドしない。
+# =============================================================================
+
+name: Release PDF
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      # 前後空白は自動除去。v 無しなら自動で v を付与
+      tag:
+        description: 'PDF をビルドするタグ（例: 26.8.2, v26.8.2）'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-pdf-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Resolve target release
+      id: target
+      env:
+        GH_TOKEN: ${{ github.token }}
+        RELEASE_TAG: ${{ github.event.release.tag_name }}
+        RAW_TAG: ${{ inputs.tag }}
+      run: |
+        if [ -n "$RELEASE_TAG" ]; then
+          tag="$RELEASE_TAG"
+        else
+          tag="$(printf '%s' "$RAW_TAG" | tr -d '[:space:]')"
+          case "$tag" in
+            v*) ;;
+            *)  tag="v$tag" ;;
+          esac
+        fi
+
+        # Pre-Release かどうかは Release の情報を正とする。
+        # release イベントの payload にも prerelease はあるが、手動実行と
+        # 経路を分けないために、どちらも API から読む。
+        if ! prerelease="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq .prerelease 2>/dev/null)"; then
+          echo "::error::タグ $tag の Release が見つかりません。先に Release を作成してください。"
+          exit 1
+        fi
+
+        if [ "$prerelease" = "true" ]; then
+          suffix="-prerelease"
+          kind="Pre-Release"
+        else
+          suffix=""
+          kind="Release"
+        fi
+
+        echo "tag=$tag" >> "$GITHUB_OUTPUT"
+        echo "kind=$kind" >> "$GITHUB_OUTPUT"
+        echo "pdf=hakone-geo-walker-$tag$suffix.pdf" >> "$GITHUB_OUTPUT"
+        echo "artifact=paper-pdf-$tag$suffix" >> "$GITHUB_OUTPUT"
+        echo "対象: $tag ($kind)"
+
+    - uses: actions/checkout@v6
+      with:
+        ref: refs/tags/${{ steps.target.outputs.tag }}
+
+    - name: Verify tag matches pyproject version
+      env:
+        TAG: ${{ steps.target.outputs.tag }}
+      run: |
+        version="$(python3 -c 'import pathlib, tomllib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"])')"
+        if [ "$TAG" != "v$version" ]; then
+          echo "::error::タグ $TAG が pyproject.toml の version と一致しません（期待: v$version）"
+          exit 1
+        fi
+        echo "OK: $TAG == v$version"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Set up Python
+      run: uv python install 3.14
+
+    - name: Install dependencies
+      run: uv sync --locked
+
+    # ローカルの MacTeX と同じフォント・パッケージが揃うようにする。
+    # MacTeX は TeX Live のフル構成だが、ここでは docs/conf.py が参照する
+    # フォントと Sphinx が要求する .sty に必要な分だけ入れる。
+    - name: Install TeX Live
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          texlive-xetex \
+          texlive-lang-japanese \
+          texlive-latex-extra \
+          fonts-texgyre \
+          latexmk
+
+    - name: Build PDF
+      env:
+        PDF: ${{ steps.target.outputs.pdf }}
+      run: |
+        make latexpdf
+        mv docs/_build/latex/hakone-geo-walker.pdf "docs/_build/latex/$PDF"
+
+    - name: Upload PDF artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.target.outputs.artifact }}
+        path: docs/_build/latex/${{ steps.target.outputs.pdf }}
+        if-no-files-found: error
+
+    - name: Attach PDF to release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        TAG: ${{ steps.target.outputs.tag }}
+        KIND: ${{ steps.target.outputs.kind }}
+        PDF: ${{ steps.target.outputs.pdf }}
+      run: |
+        # 再実行しても同じ名前のアセットを置き換えられるようにする
+        gh release upload "$TAG" "docs/_build/latex/$PDF" --clobber
+        {
+          echo "## $TAG の PDF を添付しました"
+          echo ""
+          echo "- 種別: $KIND"
+          echo "- ファイル: \`$PDF\`"
+          echo "- Release: $(gh release view "$TAG" --json url --jq .url)"
+        } >> "$GITHUB_STEP_SUMMARY"
