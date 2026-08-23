@@ -1,42 +1,12 @@
 # =============================================================================
 # Sync from private dev repo to this Public repo
 # =============================================================================
-# このリポジトリ (Public, Open Science) は、別の Private 開発リポジトリ
-# (susumuishigami/hakone-geo-walker-dev) で行った試行錯誤の成果を、
-# 任意のタイミングで取り込むワークフローを採用しています。
+# 開発リポジトリ (susumuishigami/hakone-geo-walker-dev) の指定タグの内容を
+# この公開リポジトリへ取り込み、同名のタグを打つ。
 #
-#   Private (hakone-geo-walker-dev)  ──┐
-#     - AIによる試行錯誤・WIP            │  workflow_dispatch (手動)
-#     - メモ、ドラフト等もコミット可     │  rsync (--delete + excludes)
-#                                        ▼
-#   Public  (hakone-geo-walker)
-#     - 整理された公開版のみ
-#     - 同期コミットは github-actions[bot] が作成
-#
-# 認証:
-#   - Private read-only access: Deploy Key (secrets.PRIVATE_REPO_DEPLOY_KEY)
-#   - Public push: actions/checkout の GITHUB_TOKEN (contents: write)
-#
-# 除外ファイル/ディレクトリ (Private 側に存在しても Public へは持ち込まない):
-#   - .github/workflows/  Public 側で独立管理
-#       ※ GITHUB_TOKEN は workflow ファイルの変更を push できないため
-#         (GitHub のセキュリティ仕様。permissions では解除不可)
-#       ※ workflow を Private 側でも更新したら、Public 側でも別途同じ変更を適用すること
-#   - .gitignore          Public 側で独立管理
-#       ※ Private 側の .gitignore は private 固有の運用を前提とした内容のため
-#   - data/private/       非公開データ
-#   - CLAUDE.md, AGENTS.md, .claude/  AI関連の指示・ログ
-#   - scratch/, notes/, memo/, .private/  作業メモ
-#   - *.draft.md, *.wip.md  未完成ドラフト
-#
-# タグ運用 (Private が source of truth):
-#   1. Private 側で先に annotated tag を打つ (例: `git tag -a v0.1 -m "..."; git push origin v0.1`)
-#   2. このワークフローを実行し、version 欄に同じタグ名を指定 (例: "0.1" または "v0.1")
-#   3. Private のそのタグの commit が Public に rsync される
-#   4. Public 側にも同じタグ名 (v0.1) が打たれて push される
-#   - これにより Private/Public 両方に同じタグが付き、相互の対応関係が追跡可能
-#   - Public 側に同名タグが既にあれば fail fast で停止
-#   - 間違えた場合は両側のタグを手動削除・付け直し可能
+# 2リポジトリ構成の背景と、リリースの中でこれを実行するタイミングは Wiki にある。
+#   https://github.com/susumuishigami/hakone-geo-walker/wiki/開発リポジトリ-と-公開リポジトリ
+#   https://github.com/susumuishigami/hakone-geo-walker/wiki/リリース手順
 # =============================================================================
 
 name: Sync from private
@@ -45,9 +15,9 @@ on:
   workflow_dispatch:
     inputs:
       # 前後空白は自動除去。v 無しなら自動で v を付与
-      # Private 側に既に存在するタグ名を指定すること
+      # 開発リポジトリに既に存在するタグ名を指定すること
       version:
-        description: 'Version tag on private repo (例: 0.1, v0.2.1, 1.0)'
+        description: '開発リポジトリのタグ名 (例: 0.1, v0.2.1, 1.0)'
         required: true
         type: string
 
@@ -127,6 +97,8 @@ jobs:
 
       - name: Rsync private -> public (with excludes)
         run: |
+          # 除外を追加・変更したら、開発リポジトリの CLAUDE.md にある置き場所の
+          # 案内も合わせて直すこと。
           rsync -avc --delete \
             --exclude='.git/' \
             --exclude='.github/workflows/' \
