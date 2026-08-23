@@ -1,42 +1,15 @@
 # =============================================================================
-# Sync from private dev repo to this Public repo
+# Sync from private
 # =============================================================================
-# このリポジトリ (Public, Open Science) は、別の Private 開発リポジトリ
-# (susumuishigami/hakone-geo-walker-dev) で行った試行錯誤の成果を、
-# 任意のタイミングで取り込むワークフローを採用しています。
+# 開発リポジトリ (susumuishigami/hakone-geo-walker-dev) の指定タグの内容を
+# この公開リポジトリへ取り込み、同名のタグを打つ。手動実行のみ。
 #
-#   Private (hakone-geo-walker-dev)  ──┐
-#     - AIによる試行錯誤・WIP            │  workflow_dispatch (手動)
-#     - メモ、ドラフト等もコミット可     │  rsync (--delete + excludes)
-#                                        ▼
-#   Public  (hakone-geo-walker)
-#     - 整理された公開版のみ
-#     - 同期コミットは github-actions[bot] が作成
+# 2リポジトリ構成の背景、除外パスの一覧、ワークフローを別々に管理する理由は
+# Wiki にまとめてある。下の rsync の --exclude を変更したら Wiki も直すこと。
+#   https://github.com/susumuishigami/hakone-geo-walker/wiki/リポジトリ構成
 #
-# 認証:
-#   - Private read-only access: Deploy Key (secrets.PRIVATE_REPO_DEPLOY_KEY)
-#   - Public push: actions/checkout の GITHUB_TOKEN (contents: write)
-#
-# 除外ファイル/ディレクトリ (Private 側に存在しても Public へは持ち込まない):
-#   - .github/workflows/  Public 側で独立管理
-#       ※ GITHUB_TOKEN は workflow ファイルの変更を push できないため
-#         (GitHub のセキュリティ仕様。permissions では解除不可)
-#       ※ workflow を Private 側でも更新したら、Public 側でも別途同じ変更を適用すること
-#   - .gitignore          Public 側で独立管理
-#       ※ Private 側の .gitignore は private 固有の運用を前提とした内容のため
-#   - data/private/       非公開データ
-#   - CLAUDE.md, AGENTS.md, .claude/  AI関連の指示・ログ
-#   - scratch/, notes/, memo/, .private/  作業メモ
-#   - *.draft.md, *.wip.md  未完成ドラフト
-#
-# タグ運用 (Private が source of truth):
-#   1. Private 側で先に annotated tag を打つ (例: `git tag -a v0.1 -m "..."; git push origin v0.1`)
-#   2. このワークフローを実行し、version 欄に同じタグ名を指定 (例: "0.1" または "v0.1")
-#   3. Private のそのタグの commit が Public に rsync される
-#   4. Public 側にも同じタグ名 (v0.1) が打たれて push される
-#   - これにより Private/Public 両方に同じタグが付き、相互の対応関係が追跡可能
-#   - Public 側に同名タグが既にあれば fail fast で停止
-#   - 間違えた場合は両側のタグを手動削除・付け直し可能
+# 実行するタイミングと前後の作業は次のページにある。
+#   https://github.com/susumuishigami/hakone-geo-walker/wiki/リリース手順
 # =============================================================================
 
 name: Sync from private
@@ -45,9 +18,9 @@ on:
   workflow_dispatch:
     inputs:
       # 前後空白は自動除去。v 無しなら自動で v を付与
-      # Private 側に既に存在するタグ名を指定すること
+      # 開発リポジトリに既に存在するタグ名を指定すること
       version:
-        description: 'Version tag on private repo (例: 0.1, v0.2.1, 1.0)'
+        description: '開発リポジトリのタグ名 (例: 0.1, v0.2.1, 1.0)'
         required: true
         type: string
 
