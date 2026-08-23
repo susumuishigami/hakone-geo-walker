@@ -22,6 +22,8 @@
 #       ※ GITHUB_TOKEN は workflow ファイルの変更を push できないため
 #         (GitHub のセキュリティ仕様。permissions では解除不可)
 #       ※ workflow を Private 側でも更新したら、Public 側でも別途同じ変更を適用すること
+#   - .gitignore          Public 側で独立管理
+#       ※ Private 側の .gitignore は private 固有の運用を前提とした内容のため
 #   - data/private/       非公開データ
 #   - CLAUDE.md, AGENTS.md, .claude/  AI関連の指示・ログ
 #   - scratch/, notes/, memo/, .private/  作業メモ
@@ -128,6 +130,7 @@ jobs:
           rsync -avc --delete \
             --exclude='.git/' \
             --exclude='.github/workflows/' \
+            --exclude='.gitignore' \
             --exclude='data/private/' \
             --exclude='CLAUDE.md' \
             --exclude='AGENTS.md' \

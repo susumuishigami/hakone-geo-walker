@@ -24,14 +24,11 @@ wheels/
 .installed.cfg
 *.egg
 
-# coverage（pytest-cov の生成物。いずれも再生成可能）
+# pytest-cov 生成物
 .coverage
 .coverage.*
 coverage.xml
 htmlcov/
-
-# uv
-# uv.lock と .python-version は再現性のため追跡する（無視しない）。
 
 # Sphinx
 docs/_build/
@@ -64,7 +61,4 @@ docs/_templates/
 Thumbs.db
 
 # data
-# data/private はこの非公開(dev)リポジトリでは追跡し、バックアップ・端末間共有に使う。
-# 公開リポジトリへは sync ワークフローの rsync 除外で流れない（数十MBまで。GB級は AWS 等へ）。
-# 大容量・一時生成物のみ個別に無視する。
-data/private/**/*.tmp
+data/private/*
