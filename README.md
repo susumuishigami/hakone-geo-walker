@@ -39,6 +39,8 @@ Geo walker / 地理情報行路者
 - 検証中のデータや文書には未確認の情報が含まれる場合があります  
 - 内容は予告なく変更されることがあります
 
+採番規約とリリースの扱いは [Wiki](https://github.com/susumuishigami/hakone-geo-walker/wiki) を参照してください。
+
 This repository is currently under active development and research.
 Official public versions are provided on the [Releases page](https://github.com/susumuishigami/hakone-geo-walker/releases).
 
@@ -51,35 +53,7 @@ All branches, including `main`, are drafts or works in progress.
 - Data and documents under review may include unverified information
 - Contents are subject to change without notice
 
-## バージョン / Versioning
-
-リリースは CalVer `vYY.MM.N` で採番します（例: `v26.8.1` = 2026年8月の1本目、`v26.10.1` = 同年10月の1本目）。
-その月に1本しか出さない場合も連番 `.1` を付けます。
-
-論文とデータには「後方互換性」という概念がないため、SemVer の MAJOR/MINOR/PATCH ではなく、
-公開時点が読み取れる CalVer を用いています。改訂の大小はリリースノートに記載します。
-
-バージョンの正は `pyproject.toml` の `version` です。Sphinx の `release` はここから読み出すため
-常に一致し、タグ名（`v` + この値）との一致はタグ push 時に CI が検証します。採番規約への適合は
-`tests/test_version.py` が検証します。
-
-リリースページでの扱いは次のとおりです。
-
-- **Release**（Latest として表示）: 正式な公開版
-- **Pre-release**: 正式版に至る前の版。内容は途上であり、記述の確定を保証しません
-
-正式版を出すまでは、すべて Pre-release として公開します。
-
-### 公開の条件
-
-タグを打つ前に、次をすべて満たします。
-
-1. 対象コミットが `main` にマージ済み
-2. CI の `build-html` / `quality` / `check-pdf` が成功
-3. ローカルで `make html` と `make latexpdf` が成功
-4. 公開前チェックリスト（画像の Exif、個人情報・機密情報、著作物、利用制限のあるデータ）を確認
-5. `pyproject.toml` の `version` が当月の CalVer に更新済み
-6. リリースノートに、その版で確定した内容と未確定の内容を明記
+See the [Wiki](https://github.com/susumuishigami/hakone-geo-walker/wiki) for the versioning scheme and how releases are handled.
 
 ## ディレクトリ構成
 
@@ -105,7 +79,22 @@ hakone-geo-walker/
 
 - Python 3.14以上
 - [uv](https://github.com/astral-sh/uv) 0.4.0以上（パッケージ管理）
-- LaTeX（PDF生成の場合、XeLaTeXが必要）
+- LaTeX（PDF生成の場合のみ。XeLaTeX と latexmk が必要）
+
+PDFをビルドする場合は、あわせてLaTeX環境を用意してください。日本語の組版には
+Harano Aji、欧文にはTeX Gyreを使います。いずれもTeX Liveに同梱されています。
+
+macOS:
+
+```console
+% brew install --cask mactex
+```
+
+Ubuntu / Debian:
+
+```console
+% sudo apt-get install texlive-xetex texlive-lang-japanese texlive-latex-extra fonts-texgyre latexmk
+```
 
 ### プロジェクトのセットアップ
 
@@ -189,15 +178,6 @@ PDFドキュメントをビルド
 ```console
 % uv run pytest
 ```
-
-## GitHub Actions
-
-このリポジトリでは、GitHub ActionsによるCI/CDが設定されています：
-
-- プッシュ・プルリクエスト時に、HTMLビルドと品質チェック（ruff / mypy / pytest）を自動実行
-  - [Actions](https://github.com/susumuishigami/hakone-geo-walker/actions/workflows/build.yml) - `Build Documentation` - `build-html` / `quality`
-- タグ push 時に、タグ名と `pyproject.toml` の `version` の一致を検証（`verify-tag`）
-- LaTeX/PDFのビルドについても対応予定
 
 ## ライセンス / License
 

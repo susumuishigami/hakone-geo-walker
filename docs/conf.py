@@ -44,16 +44,27 @@ latex_engine = "xelatex"
 latex_elements = {
     "papersize": "a4paper",
     "pointsize": "11pt",
+    # 注釈ブロックのアイコンを使わない。fontawesome は TeX Live では
+    # texlive-fonts-extra にしか無く、1GB を超える。Sphinx は見つからない
+    # 場合に自動で none に落とすため、明示しないと環境によって出力が
+    # 変わってしまう。
+    "sphinxsetup": "iconpackage=none",
+    # Sphinx の既定の fontpkg は欧文に FreeSerif / FreeSans / FreeMono を
+    # 指定する。MacTeX には同梱されるが Ubuntu では別パッケージのため、
+    # 上書きするだけでは「読み込めるが使わないフォント」への依存が残る。
+    # 既定を差し替えて、実際に使うフォントだけを参照する。
+    "fontpkg": r"""
+\setmainfont[BoldFont=texgyretermes-bold.otf,ItalicFont=texgyretermes-italic.otf]{texgyretermes-regular.otf}
+\setsansfont[BoldFont=texgyreheros-bold.otf]{texgyreheros-regular.otf}
+\setmonofont[BoldFont=texgyrecursor-bold.otf]{texgyrecursor-regular.otf}
+""",
     "preamble": r"""
 \usepackage{xeCJK}
-\usepackage{fontspec}
-% macOSの標準的な日本語フォントを使用
-\setCJKmainfont[BoldFont=Hiragino Mincho ProN]{Hiragino Mincho ProN}
-\setCJKsansfont[BoldFont=Hiragino Kaku Gothic ProN]{Hiragino Kaku Gothic ProN}
-\setCJKmonofont{Menlo}
-\setmainfont{Times New Roman}
-\setsansfont{Arial}
-\setmonofont{Menlo}
+\setCJKmainfont[BoldFont=HaranoAjiMincho-Bold.otf]{HaranoAjiMincho-Regular.otf}
+\setCJKsansfont[BoldFont=HaranoAjiGothic-Bold.otf]{HaranoAjiGothic-Regular.otf}
+\setCJKmonofont{HaranoAjiGothic-Regular.otf}
+% 罫線素片は和文中でダーシとして使われる（refs.bib の中田2023 のタイトル等）
+\xeCJKDeclareCharClass{CJK}{"2500->"257F}
 \xeCJKsetup{CJKmath=true}
 """,
     "fncychap": "",
