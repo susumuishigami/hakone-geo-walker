@@ -104,6 +104,7 @@ jobs:
             --exclude='.github/workflows/' \
             --exclude='.gitignore' \
             --exclude='data/private/' \
+            --exclude='research/' \
             --exclude='CLAUDE.md' \
             --exclude='AGENTS.md' \
             --exclude='.claude/' \
