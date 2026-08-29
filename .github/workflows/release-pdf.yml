@@ -110,13 +110,31 @@ jobs:
     # ローカルの MacTeX と同じフォント・パッケージが揃うようにする。
     # MacTeX は TeX Live のフル構成だが、ここでは docs/conf.py が参照する
     # フォントと Sphinx が要求する .sty に必要な分だけ入れる。
+    #
+    #   texlive-fonts-recommended : hyperref のリンク注釈が使う pzdr.tfm
+    #   texlive-lang-cjk          : docs/conf.py が読み込む xeCJK.sty
+    #   texlive-lang-chinese      : xeCJK が内部で要求する ctexhook.sty
+    #   texlive-pictures          : Sphinx が要求する ellipse.sty / pict2e.sty
+    #   texlive-lang-japanese     : Harano Aji フォント（同パッケージに同梱）
+    #
+    # texlive-latex-recommended は texlive-latex-extra の依存に含まれるが、
+    # 推移的依存に頼らず明示する。
+    #
+    # texlive-fonts-extra は入れない。Sphinx が注釈ブロックのアイコンに使う
+    # fontawesome はこのパッケージにしか無いが、展開後 1.73GB になる。
+    # docs/conf.py で iconpackage=none を指定してアイコンを使わないため不要。
     - name: Install TeX Live
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends \
           texlive-xetex \
-          texlive-lang-japanese \
+          texlive-latex-recommended \
           texlive-latex-extra \
+          texlive-fonts-recommended \
+          texlive-pictures \
+          texlive-lang-cjk \
+          texlive-lang-chinese \
+          texlive-lang-japanese \
           fonts-texgyre \
           latexmk
 
